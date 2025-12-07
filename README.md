@@ -2,6 +2,8 @@
 
 這是一款以 Jetpack Compose 打造的天氣預報 Android 應用程式
 
+https://github.com/user-attachments/assets/81dbff2a-387e-4c03-9f04-0d83eac0353d
+
 ## 主要功能
 
 * **探索天氣**：使用者可以在主畫面 (`:feature:home`) 輸入任何想查詢的城市，應用程式會透過 API 取得即時天氣資料

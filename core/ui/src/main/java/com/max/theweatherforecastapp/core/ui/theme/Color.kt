@@ -1,4 +1,4 @@
-package com.max.theweatherforecastapp.ui.theme
+package com.max.theweatherforecastapp.core.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

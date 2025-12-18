@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">TheWeatherForecastApp</string>
+    <string name="search_location">Search for a location</string>
+    <string name="celsius_symbol">°C</string>
+    <string name="high_temp_prefix">H:</string>
+    <string name="low_temp_prefix">L:</string>
+    <string name="degree_symbol">°</string>
+    <string name="hourly_forecast_title">HOURLY FORECAST</string>
+    <string name="now">Now</string>
+    <string name="seven_day_forecast_title">7-DAY FORECAST</string>
+</resources>

@@ -7,6 +7,7 @@ import com.max.theweatherforecastapp.core.domain.model.Weather
 import com.max.theweatherforecastapp.core.domain.model.AppResult
 import com.max.theweatherforecastapp.core.domain.model.DomainError
 import com.max.theweatherforecastapp.core.domain.usecase.GetWeatherUseCase
+import com.max.theweatherforecastapp.core.domain.usecase.UserPreferencesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,13 +16,24 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WeatherViewModel @Inject constructor(
-    private val getWeatherUseCase: GetWeatherUseCase
+    private val getWeatherUseCase: GetWeatherUseCase,
+    private val userPreferencesUseCase: UserPreferencesUseCase
 ) : ViewModel() {
 
     private val _weatherState = MutableStateFlow<WeatherState>(WeatherState.Idle)
     val weatherState: StateFlow<WeatherState> = _weatherState
 
-    fun fetchWeather(location: GeocodingLocation) {
+    init {
+        viewModelScope.launch {
+            userPreferencesUseCase.lastSelectedCity.collect { location ->
+                location?.let {
+                    fetchWeather(it)
+                }
+            }
+        }
+    }
+
+    private fun fetchWeather(location: GeocodingLocation) {
         viewModelScope.launch {
             getWeatherUseCase(location).collect { result ->
                 _weatherState.value = when (result) {

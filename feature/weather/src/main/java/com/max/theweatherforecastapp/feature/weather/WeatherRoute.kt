@@ -20,7 +20,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
@@ -28,8 +28,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,17 +41,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.max.theweatherforecastapp.core.domain.model.Current
 import com.max.theweatherforecastapp.core.domain.model.Daily
 import com.max.theweatherforecastapp.core.domain.model.DomainError
-import com.max.theweatherforecastapp.core.domain.model.GeocodingLocation
 import com.max.theweatherforecastapp.core.domain.model.Hourly
 import com.max.theweatherforecastapp.core.domain.model.Weather
 import com.max.theweatherforecastapp.core.domain.model.Temp
 import com.max.theweatherforecastapp.core.domain.model.WeatherDetail
 import com.max.theweatherforecastapp.core.ui.mapper.getResId
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -62,16 +62,9 @@ import java.util.TimeZone
 @Composable
 fun WeatherRoute(
     weatherViewModel: WeatherViewModel = hiltViewModel(),
-    selectedLocation: GeocodingLocation?,
     onNavigateToHome: () -> Unit
 ) {
-    LaunchedEffect(selectedLocation) {
-        selectedLocation?.let { location ->
-            weatherViewModel.fetchWeather(location)
-        }
-    }
-
-    val weatherState by weatherViewModel.weatherState.collectAsState()
+    val weatherState by weatherViewModel.weatherState.collectAsStateWithLifecycle()
 
     WeatherScreen(
         state = weatherState,
@@ -162,12 +155,12 @@ private fun WeatherContent(weather: Weather) {
         }
 
         item {
-            weather.hourly?.let { HourlyForecast(it) }
+            HourlyForecast(weather.hourly)
             Spacer(modifier = Modifier.height(16.dp))
         }
 
         item {
-            weather.daily?.let { WeeklyForecast(it) }
+            WeeklyForecast(weather.daily)
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
@@ -218,7 +211,7 @@ private fun CurrentWeatherInfo(weather: Weather) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        val today = weather.daily?.firstOrNull()
+        val today = weather.daily.firstOrNull()
         val maxTemp = today?.temp?.max?.toInt()
         val minTemp = today?.temp?.min?.toInt()
         val degree = stringResource(R.string.degree_symbol)
@@ -311,7 +304,7 @@ private fun WeeklyForecast(daily: List<Daily>) {
             daily.forEachIndexed { index, day ->
                 DailyForecastRow(day)
                 if (index < daily.size - 1) {
-                    Divider(color = Color.White.copy(alpha = 0.3f))
+                    HorizontalDivider(color = Color.White.copy(alpha = 0.3f))
                 }
             }
         }
@@ -383,21 +376,23 @@ private fun formatUnixTime(unixTime: Long, format: String): String {
 private fun mockWeather(): Weather {
     val mockWeatherDetail = WeatherDetail("Clouds", "overcast clouds", "04d")
     val mockTemp = Temp(min = 15.0, max = 22.0)
-    val mockCurrent = Current(temp = 18.0, weather = listOf(mockWeatherDetail))
+    val mockCurrent = Current(temp = 18.0, weather = persistentListOf(mockWeatherDetail))
     val mockHourly = (1..10).map {
         Hourly(
             dt = System.currentTimeMillis() / 1000 + (it * 3600),
             temp = 18.0 + it,
-            weather = listOf(mockWeatherDetail)
+            weather = persistentListOf(mockWeatherDetail)
         )
-    }
+    }.toImmutableList()
+
     val mockDaily = (1..7).map {
         Daily(
             dt = System.currentTimeMillis() / 1000 + (it * 86400),
             temp = mockTemp,
-            weather = listOf(mockWeatherDetail)
+            weather = persistentListOf(mockWeatherDetail)
         )
-    }
+    }.toImmutableList()
+
     return Weather(
         name = "Taipei",
         lat = 25.03,

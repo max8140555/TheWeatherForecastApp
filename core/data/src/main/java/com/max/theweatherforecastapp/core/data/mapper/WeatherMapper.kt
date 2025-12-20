@@ -8,6 +8,8 @@ import com.max.theweatherforecastapp.core.domain.model.Weather
 import com.max.theweatherforecastapp.core.domain.model.Temp
 import com.max.theweatherforecastapp.core.domain.model.WeatherDetail
 import com.max.theweatherforecastapp.core.network.model.WeatherResponse
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import com.max.theweatherforecastapp.core.data.model.CurrentWeather as CurrentWeatherEntity
 import com.max.theweatherforecastapp.core.data.model.DailyWeather as DailyWeatherEntity
 import com.max.theweatherforecastapp.core.data.model.FeelsLike as FeelsLikeEntity
@@ -28,8 +30,8 @@ fun WeatherResponse.toEntity(
 ): WeatherEntity =
     WeatherEntity(
         name = name,
-        locationCountry = locationCountry,
-        locationState = locationState,
+        locationCountry = locationCountry ?: "",
+        locationState = locationState ?: "",
         lat = lat,
         lon = lon,
         timezone = timezone,
@@ -127,32 +129,32 @@ fun WeatherEntity.toDomain(): Weather =
         name = name,
         lat = lat,
         lon = lon,
-        locationCountry = locationCountry,
+        locationCountry = locationCountry ?: "",
         locationState = locationState,
         timezone = timezone,
         current = current?.toDomain(),
-        hourly = hourly?.map { it.toDomain() },
-        daily = daily?.map { it.toDomain() }
+        hourly = hourly?.map { it.toDomain() }?.toImmutableList() ?: persistentListOf(),
+        daily = daily?.map { it.toDomain() }?.toImmutableList() ?: persistentListOf(),
     )
 
 private fun CurrentWeatherEntity.toDomain(): Current =
     Current(
         temp = temp,
-        weather = weather.map { it.toDomain() }
+        weather = weather.map { it.toDomain() }.toImmutableList()
     )
 
 private fun HourlyWeatherEntity.toDomain(): Hourly =
     Hourly(
         dt = dt,
         temp = temp,
-        weather = weather.map { it.toDomain() }
+        weather = weather.map { it.toDomain() }.toImmutableList()
     )
 
 private fun DailyWeatherEntity.toDomain(): Daily =
     Daily(
         dt = dt,
         temp = temp.toDomain(),
-        weather = weather.map { it.toDomain() }
+        weather = weather.map { it.toDomain() }.toImmutableList()
     )
 
 private fun TempEntity.toDomain(): Temp =

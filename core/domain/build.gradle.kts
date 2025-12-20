@@ -15,4 +15,5 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 dependencies {
     implementation("javax.inject:javax.inject:1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    api(libs.kotlinx.collections.immutable)
 }

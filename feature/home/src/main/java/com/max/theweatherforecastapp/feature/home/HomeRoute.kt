@@ -21,7 +21,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,18 +30,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.max.theweatherforecastapp.core.domain.model.DomainError
 import com.max.theweatherforecastapp.core.domain.model.GeocodingLocation
 import com.max.theweatherforecastapp.core.ui.mapper.getResId
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun HomeRoute(
     homeViewModel: HomeViewModel = hiltViewModel(),
     onNavigateToWeather: (GeocodingLocation) -> Unit
 ) {
-    val searchQuery by homeViewModel.searchQuery.collectAsState()
-    val searchUiState by homeViewModel.searchUiState.collectAsState()
-    val historyLocationUiState by homeViewModel.historyLocationUiState.collectAsState()
+    val searchQuery by homeViewModel.searchQuery.collectAsStateWithLifecycle()
+    val searchUiState by homeViewModel.searchUiState.collectAsStateWithLifecycle()
+    val historyLocationUiState by homeViewModel.historyLocationUiState.collectAsStateWithLifecycle()
 
     HomeScreen(
         searchQuery = searchQuery,
@@ -237,7 +238,7 @@ private fun LocationListItem(
 }
 
 /** Preview data */
-private val previewLocations = listOf(
+private val previewLocations = persistentListOf(
     GeocodingLocation(
         name = "Taipei",
         lat = 25.03,
@@ -277,7 +278,7 @@ fun HomeScreenSearchSuccessPreview() {
         HomeScreen(
             searchQuery = "Ta",
             searchUiState = SearchUiState.Success(previewLocations),
-            historyLocationUiState = HistoryLocationUiState.Success(emptyList()),
+            historyLocationUiState = HistoryLocationUiState.Success(persistentListOf()),
             onSearchQueryChanged = {},
             onNavigateToWeather = {}
         )
@@ -291,7 +292,7 @@ fun HomeScreenLoadingPreview() {
         HomeScreen(
             searchQuery = "Ta",
             searchUiState = SearchUiState.Loading,
-            historyLocationUiState = HistoryLocationUiState.Success(emptyList()),
+            historyLocationUiState = HistoryLocationUiState.Success(persistentListOf()),
             onSearchQueryChanged = {},
             onNavigateToWeather = {}
         )

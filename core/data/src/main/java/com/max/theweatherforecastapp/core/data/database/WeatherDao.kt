@@ -16,7 +16,7 @@ abstract class WeatherDao {
     @Query("UPDATE weather_data SET lastUsedAt = :timestamp WHERE name = :name")
     abstract suspend fun updateLastUsedTimestamp(name: String, timestamp: Long)
 
-    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertWeather(weather: WeatherEntity)
 
     @Query("DELETE FROM weather_data WHERE fetchedAt = (SELECT MIN(fetchedAt) FROM weather_data)")

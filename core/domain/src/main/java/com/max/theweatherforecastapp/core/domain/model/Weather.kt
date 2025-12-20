@@ -1,32 +1,34 @@
 package com.max.theweatherforecastapp.core.domain.model
 
+import kotlinx.collections.immutable.ImmutableList
+
 data class Weather(
     val name: String,
     val lat: Double,
     val lon: Double,
-    val locationCountry: String?,
+    val locationCountry: String,
     val locationState: String?,
     val timezone: String,
     val current: Current?,
-    val hourly: List<Hourly>?,
-    val daily: List<Daily>?
+    val hourly: ImmutableList<Hourly>,
+    val daily: ImmutableList<Daily>
 )
 
 data class Current(
     val temp: Double,
-    val weather: List<WeatherDetail>
+    val weather: ImmutableList<WeatherDetail>
 )
 
 data class Hourly(
     val dt: Long,
     val temp: Double,
-    val weather: List<WeatherDetail>
+    val weather: ImmutableList<WeatherDetail>
 )
 
 data class Daily(
     val dt: Long,
     val temp: Temp,
-    val weather: List<WeatherDetail>
+    val weather: ImmutableList<WeatherDetail>
 )
 
 data class Temp(

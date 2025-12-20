@@ -39,6 +39,17 @@ android {
     buildFeatures {
         compose = true
     }
+
+    composeCompiler {
+        val isReleaseBuild = project.gradle.startParameter.taskNames.any {
+            it.contains("release", ignoreCase = true)
+        }
+
+        if (!isReleaseBuild) {
+            metricsDestination = layout.buildDirectory.dir("compose_compiler")
+            reportsDestination = layout.buildDirectory.dir("compose_compiler")
+        }
+    }
 }
 
 dependencies {

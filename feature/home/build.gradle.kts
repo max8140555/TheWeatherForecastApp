@@ -3,7 +3,6 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt.android)
-    alias(libs.plugins.kotlinx.serialization)
     kotlin("kapt")
 }
 
@@ -28,6 +27,17 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+
+    composeCompiler {
+        val isReleaseBuild = project.gradle.startParameter.taskNames.any {
+            it.contains("release", ignoreCase = true)
+        }
+
+        if (!isReleaseBuild) {
+            metricsDestination = layout.buildDirectory.dir("compose_compiler")
+            reportsDestination = layout.buildDirectory.dir("compose_compiler")
+        }
+    }
 }
 
 dependencies {
@@ -44,8 +54,6 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
-    
-    implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockk.android)

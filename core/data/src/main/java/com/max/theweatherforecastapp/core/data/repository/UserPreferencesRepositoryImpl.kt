@@ -7,15 +7,14 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.max.theweatherforecastapp.core.domain.model.GeocodingLocation
 import com.max.theweatherforecastapp.core.domain.repository.UserPreferencesRepository
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class UserPreferencesRepositoryImpl @Inject constructor(
-    private val dataStore: DataStore<Preferences>
+    private val dataStore: DataStore<Preferences>,
+    moshi: Moshi
 ) : UserPreferencesRepository {
-    private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
     private val locationAdapter = moshi.adapter(GeocodingLocation::class.java)
 
     private object PreferencesKeys {

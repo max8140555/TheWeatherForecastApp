@@ -8,6 +8,8 @@ import com.max.theweatherforecastapp.core.domain.model.DomainError
 import com.max.theweatherforecastapp.core.domain.usecase.GetAllCacheWeatherUseCase
 import com.max.theweatherforecastapp.core.domain.usecase.GetLocationsByCityNameUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,13 +25,13 @@ import javax.inject.Inject
 sealed interface SearchUiState {
     object Idle : SearchUiState
     object Loading : SearchUiState
-    data class Success(val locations: List<GeocodingLocation>) : SearchUiState
+    data class Success(val locations: ImmutableList<GeocodingLocation>) : SearchUiState
     data class Error(val error: DomainError) : SearchUiState
 }
 
 sealed interface HistoryLocationUiState {
     object Loading : HistoryLocationUiState
-    data class Success(val historyLocation: List<GeocodingLocation>) : HistoryLocationUiState
+    data class Success(val historyLocation: ImmutableList<GeocodingLocation>) : HistoryLocationUiState
     data class Error(val error: DomainError) : HistoryLocationUiState
 }
 
@@ -63,7 +65,7 @@ class HomeViewModel @Inject constructor(
             .onEach { result ->
                 _searchUiState.value = when (result) {
                     is AppResult.Loading -> SearchUiState.Loading
-                    is AppResult.Success -> SearchUiState.Success(result.data)
+                    is AppResult.Success -> SearchUiState.Success(result.data.toImmutableList())
                     is AppResult.Failure -> SearchUiState.Error(result.error)
                 }
             }
@@ -79,9 +81,10 @@ class HomeViewModel @Inject constructor(
                         lat = it.lat,
                         lon = it.lon,
                         state = it.locationState,
-                        country = it.locationCountry ?: ""
+                        country = it.locationCountry
                     )
-                }
+                }.toImmutableList()
+
                 _historyLocationUiState.value = HistoryLocationUiState.Success(historyCity)
             }
             .catch { 

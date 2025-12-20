@@ -1,5 +1,6 @@
 package com.max.theweatherforecastapp.core.data.database
 
+import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
 import com.max.theweatherforecastapp.core.data.model.CurrentWeather
 import com.max.theweatherforecastapp.core.data.model.DailyWeather
@@ -9,13 +10,12 @@ import com.max.theweatherforecastapp.core.data.model.Temp
 import com.max.theweatherforecastapp.core.data.model.WeatherDescription
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import javax.inject.Inject
 
-class DatabaseConverters {
-
-    private val moshi = Moshi.Builder()
-        .add(KotlinJsonAdapterFactory())
-        .build()
+@ProvidedTypeConverter
+class DatabaseConverters @Inject constructor(
+    moshi: Moshi
+) {
 
     private val hourlyWeatherListAdapter = moshi.adapter<List<HourlyWeather>>(Types.newParameterizedType(List::class.java, HourlyWeather::class.java))
     private val dailyWeatherListAdapter = moshi.adapter<List<DailyWeather>>(Types.newParameterizedType(List::class.java, DailyWeather::class.java))

@@ -8,7 +8,7 @@ import com.max.theweatherforecastapp.navigation.AppScreen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,13 +23,9 @@ class MainViewModel @Inject constructor(
     private val _startDestination = MutableStateFlow<AppScreen?>(null)
     val startDestination = _startDestination.asStateFlow()
 
-    private val _selectedLocation = MutableStateFlow<GeocodingLocation?>(null)
-    val selectedLocation = _selectedLocation.asStateFlow()
-
     init {
         viewModelScope.launch {
-            val city = userPreferencesUseCase.lastSelectedCity.first()
-            _selectedLocation.value = city
+            val city = userPreferencesUseCase.lastSelectedCity.firstOrNull()
             _startDestination.value = if (city == null) AppScreen.Home else AppScreen.Weather
             _isLoading.value = false
         }
@@ -37,7 +33,6 @@ class MainViewModel @Inject constructor(
 
     fun onLocationSelected(location: GeocodingLocation) {
         viewModelScope.launch {
-            _selectedLocation.value = location
             userPreferencesUseCase.saveLastSelectedLocation(location)
         }
     }

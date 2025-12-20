@@ -10,11 +10,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -45,8 +45,8 @@ fun AppNavigation(mainViewModel: MainViewModel) {
 
     NavHost(navController = navController, startDestination = AppScreen.Launch.name) {
         composable(AppScreen.Launch.name) {
-            val isLoading by mainViewModel.isLoading.collectAsState()
-            val startDestination by mainViewModel.startDestination.collectAsState()
+            val isLoading by mainViewModel.isLoading.collectAsStateWithLifecycle()
+            val startDestination by mainViewModel.startDestination.collectAsStateWithLifecycle()
 
             if (!isLoading && startDestination != null) {
                 LaunchedEffect(Unit) {
@@ -74,9 +74,7 @@ fun AppNavigation(mainViewModel: MainViewModel) {
             )
         }
         composable(AppScreen.Weather.name) {
-            val selectedCity by mainViewModel.selectedLocation.collectAsState()
             WeatherRoute(
-                selectedLocation = selectedCity,
                 onNavigateToHome = {
                     if (!navController.popBackStack()) {
                         navController.navigate(AppScreen.Home.name) {
